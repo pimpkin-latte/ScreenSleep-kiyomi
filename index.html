@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screen Time & Sleep Quality | yzma</title>
+<!-- Coded by Syeda Yzma Khan, Class 20D -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f7f4ef;
+    --cream2: #ede9e2;
+    --dark: #1e1e1a;
+    --mid: #5a5751;
+    --muted: #9a9690;
+    --sage: #6b8f71;
+    --sage-light: #e8f0e9;
+    --border: #ddd9d2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--dark);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(247,244,239,0.93);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 60px;
+    height: 64px;
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dark);
+    letter-spacing: 0.02em;
+    text-decoration: none;
+  }
+
+  .nav-menu { display: flex; align-items: center; list-style: none; }
+  .nav-item { position: relative; }
+
+  .nav-link {
+    display: block;
+    padding: 20px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--mid);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .nav-link:hover { color: var(--dark); }
+
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    min-width: 200px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    overflow: hidden;
+  }
+
+  .nav-item:hover .dropdown {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+
+  .dropdown a {
+    display: block;
+    padding: 11px 18px;
+    font-size: 13px;
+    color: var(--mid);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    border-bottom: 1px solid #f5f2ed;
+  }
+
+  .dropdown a:last-child { border-bottom: none; }
+  .dropdown a:hover { background: var(--cream); color: var(--dark); }
+
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    align-items: center;
+    padding: 120px 60px 80px;
+    position: relative;
+    z-index: 1;
+    background: var(--cream);
+  }
+
+  .hero-left::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 60%, rgba(107,143,113,0.07) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-inner { position: relative; z-index: 1; }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 22px;
+  }
+
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 5vw, 76px);
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--dark);
+    margin-bottom: 24px;
+    letter-spacing: 0.01em;
+  }
+
+  .hero h1 em { font-style: italic; color: var(--sage); }
+
+  .hero-desc {
+    font-size: 15px;
+    color: var(--mid);
+    line-height: 1.8;
+    max-width: 420px;
+    margin-bottom: 40px;
+    font-weight: 300;
+  }
+
+  .hero-btn {
+    display: inline-block;
+    background: var(--dark);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 13px 30px;
+    border-radius: 6px;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: background 0.2s;
+  }
+
+  .hero-btn:hover { background: #333; }
+
+  .hero-right { position: relative; overflow: hidden; }
+
+  .hero-right img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .hero-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, var(--cream) 0%, transparent 20%);
+    z-index: 1;
+  }
+
+  .section { padding: 90px 60px; }
+  .section-alt { background: var(--cream2); }
+  .section-inner { max-width: 960px; margin: 0 auto; }
+
+  .section-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 46px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--dark);
+    margin-bottom: 16px;
+    letter-spacing: 0.01em;
+  }
+
+  .section-desc {
+    font-size: 15px;
+    color: var(--mid);
+    line-height: 1.75;
+    max-width: 560px;
+    font-weight: 300;
+  }
+
+  #objective .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 52px;
+  }
+
+  .obj-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+  }
+
+  .obj-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 10px;
+  }
+
+  .obj-card p { font-size: 14px; color: var(--mid); line-height: 1.7; font-weight: 300; }
+
+  .obj-icon {
+    width: 40px; height: 40px;
+    background: var(--sage-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  #scope .scope-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 52px;
+  }
+
+  .scope-item { border-top: 2px solid var(--sage); padding-top: 20px; }
+
+  .scope-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--cream2);
+    margin-bottom: 10px;
+  }
+
+  .scope-item h4 { font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 8px; }
+  .scope-item p { font-size: 13px; color: var(--mid); line-height: 1.65; font-weight: 300; }
+
+  #title-section { background: var(--dark); padding: 90px 60px; }
+  #title-section .section-eyebrow { color: var(--sage); }
+  #title-section .section-title { color: #fff; }
+
+  .title-card {
+    margin-top: 52px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .title-main {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .title-main em { color: #a8c5a0; font-style: italic; }
+  .title-sub { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.7; font-weight: 300; }
+
+  .title-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .tag {
+    display: inline-block;
+    background: rgba(107,143,113,0.2);
+    border: 1px solid rgba(107,143,113,0.3);
+    color: #a8c5a0;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: 20px;
+  }
+
+  #content .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 52px;
+  }
+
+  .content-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .content-card:hover { border-color: var(--sage); transform: translateY(-3px); }
+  .content-card-icon { font-size: 24px; margin-bottom: 14px; }
+
+  .content-card h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+
+  .content-card p { font-size: 13px; color: var(--mid); line-height: 1.65; font-weight: 300; }
+
+  #contact { background: var(--cream2); padding: 90px 60px; }
+  .contact-inner { max-width: 960px; margin: 0 auto; }
+
+  .contact-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px;
+    margin-top: 52px;
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 48px;
+  }
+
+  .contact-info h3,
+  .contact-uni h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 20px;
+  }
+
+  .contact-row { display: flex; flex-direction: column; gap: 16px; }
+
+  .contact-field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .contact-field span { font-size: 14px; color: var(--dark); font-weight: 400; line-height: 1.7; }
+
+  .contact-field a {
+    font-size: 14px;
+    color: var(--sage);
+    font-weight: 400;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .contact-field a:hover { color: var(--dark); }
+
+  .contact-divider { background: var(--border); }
+
+  .uni-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--sage-light);
+    border: 1px solid rgba(107,143,113,0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+
+  .uni-badge-icon { font-size: 22px; }
+  .uni-badge-text { font-size: 14px; font-weight: 500; color: var(--dark); line-height: 1.4; }
+  .uni-badge-text span { display: block; font-size: 12px; color: var(--mid); font-weight: 300; }
+
+  /* MEMBERS TABLE */
+  .members-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+
+  .members-table tr { border-bottom: 1px solid var(--border); }
+  .members-table tr:last-child { border-bottom: none; }
+
+  .members-table td {
+    padding: 9px 0;
+    font-size: 13px;
+    color: var(--dark);
+  }
+
+  .members-table td:first-child {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    width: 28px;
+    letter-spacing: 0.05em;
+  }
+
+  .members-table tr:first-child td { font-weight: 600; color: var(--dark); }
+
+  /* REFERENCES */
+  #references { background: var(--cream); padding: 90px 60px; }
+  .references-inner { max-width: 960px; margin: 0 auto; }
+
+  .ref-list { margin-top: 48px; display: flex; flex-direction: column; gap: 0; }
+
+  .ref-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .ref-item:last-child { border-bottom: none; }
+
+  .ref-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--cream2);
+    flex-shrink: 0;
+    width: 32px;
+    line-height: 1.2;
+  }
+
+  .ref-body { flex: 1; }
+
+  .ref-source {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 4px;
+  }
+
+  .ref-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 4px;
+    text-decoration: none;
+    display: inline-block;
+    transition: color 0.2s;
+    line-height: 1.3;
+  }
+
+  .ref-title:hover { color: var(--sage); }
+
+  .ref-desc { font-size: 13px; color: var(--mid); line-height: 1.6; font-weight: 300; }
+
+  footer {
+    background: var(--dark);
+    padding: 28px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-inner > * { opacity: 0; animation: fadeUp 0.7s ease forwards; }
+  .hero-eyebrow { animation-delay: 0.1s; }
+  .hero h1 { animation-delay: 0.25s; }
+  .hero-desc { animation-delay: 0.4s; }
+  .hero-btn { animation-delay: 0.55s; }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 24px; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 100px 24px 60px; }
+    .hero-right { height: 300px; }
+    .hero-right::before { background: linear-gradient(to bottom, var(--cream) 0%, transparent 30%); }
+    .section { padding: 60px 24px; }
+    #objective .two-col,
+    #scope .scope-grid,
+    .title-card,
+    #content .content-grid { grid-template-columns: 1fr; gap: 16px; }
+    .contact-card { grid-template-columns: 1fr; gap: 24px; }
+    .contact-divider { display: none; }
+    footer { flex-direction: column; gap: 10px; text-align: center; }
+    #references { padding: 60px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#home" class="nav-logo">Screen &amp; Sleep</a>
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <span class="nav-link">Home &#9662;</span>
+      <div class="dropdown">
+        <a href="#objective">Objective</a>
+        <a href="#scope">Scope</a>
+        <a href="#title-section">Title of Project</a>
+        <a href="#content">Content</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link">Contact Us &#9662;</span>
+      <div class="dropdown">
+        <a href="#contact">Name</a>
+        <a href="#contact">Programme</a>
+        <a href="#contact">University</a>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a href="#references" class="nav-link">References</a>
+    </li>
+  </ul>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-left">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Awareness Campaign &middot; 2026</div>
+      <h1>Screen Time<br>&amp; <em>Sleep Quality</em></h1>
+      <p class="hero-desc">A student research project exploring how daily screen habits affect sleep health, cognitive function and academic performance among young adults.</p>
+      <a href="#objective" class="hero-btn">Explore the Research</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCALsBGADASIAAhEBAxEB/8QAHQABAQACAwEBAQAAAAAAAAAAAAIDBAEFBgcICf/EADsQAQACAgECBgECAwUHAwUAAAACAwQFEgYiBxMUMkJSYggVcoKSIzNTVZQBFjRDRFSTJFZjJSYxorL/xAAZAQEBAQEBAQAAAAAAAAAAAAAAAgMEAQX/xAAjEQEAAwACAgMAAwEBAAAAAAAAAgMSEyIBBBEUMgUhQiNB/9oADAMBAAIRAxEAPwD8mACAAAAAAAAAAAAAAAAAAAAQALAAAAAAAAAAAAAAAAFiAFoWAgWAIWAgBCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQALAAAAAAAAAAAAAAAABaFgAAAAAAAAgBAACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAALAAAAAAAAAAAAAABaFgAAAAAAAAAgABAACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAALAAAAAAAAAAAAAAAAFgAAAAAAAAAAAgBAACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABaAAAAAAAAAAAAAAAAAAFiFgAAAAAAAAAAAAgAABCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABaAAAAAAAAAAAAAAAAAAAAAWAgWAAAAAAAAAAAAAgAABCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABYACAAAAAAAAAAAAAAAAAAAAAAAWAAAAAAAAAAAAAgAABCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABaAAAAAAAAAAAAAAAAAAAFgAAAAAAAAAAAAAAAAAAgAABCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAALAAAAAAAAAAAAAAAABaFgAAAAAAAAAAAAAAAAAAIAABCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFoWgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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" alt="Person using phone in bed at night">
+  </div>
+</section>
+
+<section class="section" id="objective">
+  <div class="section-inner">
+    <div class="section-eyebrow">Home / Objective</div>
+    <div class="section-title">Objective</div>
+    <p class="section-desc">This project investigates the relationship between screen time habits and sleep quality among young adults and raises awareness through data driven insights.</p>
+    <div class="two-col">
+      <div class="obj-card">
+        <div class="obj-icon">&#128300;</div>
+        <h3>Research Goal</h3>
+        <p>To understand how screen exposure before sleep impacts sleep duration, quality and overall daytime functioning in students.</p>
+      </div>
+      <div class="obj-card">
+        <div class="obj-icon">&#128226;</div>
+        <h3>Awareness Goal</h3>
+        <p>To present findings in an accessible way that encourages students to reflect on their screen habits and make informed changes.</p>
+      </div>
+      <div class="obj-card">
+        <div class="obj-icon">&#128202;</div>
+        <h3>Data Collection</h3>
+        <p>Survey responses gathered from students will be analysed to identify patterns between screen use and reported sleep outcomes.</p>
+      </div>
+      <div class="obj-card">
+        <div class="obj-icon">&#128161;</div>
+        <h3>Practical Outcomes</h3>
+        <p>Evidence based recommendations and awareness materials to help students improve their sleep through small lifestyle changes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="scope">
+  <div class="section-inner">
+    <div class="section-eyebrow">Home / Scope</div>
+    <div class="section-title">Scope</div>
+    <p class="section-desc">The boundaries and focus areas of this research project.</p>
+    <div class="scope-grid">
+      <div class="scope-item">
+        <div class="scope-num">01</div>
+        <h4>Target Group</h4>
+        <p>Students and young adults who regularly use digital devices as part of their daily routine.</p>
+      </div>
+      <div class="scope-item">
+        <div class="scope-num">02</div>
+        <h4>Focus Area</h4>
+        <p>Screen usage patterns before and during sleep hours including device type, duration and content consumed.</p>
+      </div>
+      <div class="scope-item">
+        <div class="scope-num">03</div>
+        <h4>Health Metrics</h4>
+        <p>Self-reported sleep quality, duration, tiredness levels and perceived impact on academic performance.</p>
+      </div>
+      <div class="scope-item">
+        <div class="scope-num">04</div>
+        <h4>Data Method</h4>
+        <p>Small scale survey research via Google Forms with quantitative analysis carried out in Microsoft Excel.</p>
+      </div>
+      <div class="scope-item">
+        <div class="scope-num">05</div>
+        <h4>Deliverables</h4>
+        <p>Awareness posters, a project report, presentation slides and this website as the primary outputs.</p>
+      </div>
+      <div class="scope-item">
+        <div class="scope-num">06</div>
+        <h4>Limitations</h4>
+        <p>Findings are based on self-reported data and represent a limited sample. Results are indicative rather than clinically conclusive.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="title-section">
+  <div class="section-inner">
+    <div class="section-eyebrow">Home / Title of Final Project</div>
+    <div class="section-title">Title of Final Project</div>
+    <div class="title-card">
+      <div>
+        <div class="title-main">Screen Time &amp;<br><em>Sleep Quality</em><br>Awareness</div>
+        <p class="title-sub">A small scale research project exploring how digital device habits among young adults influence sleep patterns, health outcomes and academic performance.</p>
+      </div>
+      <div>
+        <p style="font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:16px;">Key Topics Covered</p>
+        <div class="title-tags">
+          <span class="tag">Blue Light &amp; Brain</span>
+          <span class="tag">Sleep Deprivation</span>
+          <span class="tag">Screen Habits</span>
+          <span class="tag">Academic Performance</span>
+          <span class="tag">Health Awareness</span>
+          <span class="tag">Student Wellbeing</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="content">
+  <div class="section-inner">
+    <div class="section-eyebrow">Home / Content</div>
+    <div class="section-title">Content</div>
+    <p class="section-desc">What this project covers across all its deliverables and awareness materials.</p>
+    <div class="content-grid">
+      <div class="content-card">
+        <div class="content-card-icon">&#128309;</div>
+        <h4>Blue Light &amp; The Brain</h4>
+        <p>How screens emit blue light that suppresses melatonin and disrupts the body's natural sleep cycle.</p>
+      </div>
+      <div class="content-card">
+        <div class="content-card-icon">&#128564;</div>
+        <h4>Signs of Sleep Deprivation</h4>
+        <p>Physical and cognitive symptoms that indicate chronic sleep debt caused by late night screen use.</p>
+      </div>
+      <div class="content-card">
+        <div class="content-card-icon">&#128245;</div>
+        <h4>Breaking Bad Screen Habits</h4>
+        <p>Practical and evidence based strategies to reduce screen time at night and build healthier routines.</p>
+      </div>
+      <div class="content-card">
+        <div class="content-card-icon">&#128218;</div>
+        <h4>Screen Time &amp; Academic Performance</h4>
+        <p>How excessive device use affects concentration, memory retention, grades and student productivity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact-inner">
+    <div class="section-eyebrow">Contact Us</div>
+    <div class="section-title">Contact Us</div>
+    <div class="contact-card">
+      <div class="contact-info">
+        <h3>Group Members</h3>
+        <div class="contact-row">
+          <div class="contact-field">
+            <label>Website Coded by</label>
+            <span>Syeda Yzma Khan</span>
+          </div>
+          <div class="contact-field">
+            <label>Email</label>
+            <a href="mailto:missyzma@gmail.com">missyzma@gmail.com</a>
+          </div>
+          <div class="contact-field">
+            <label>Class</label>
+            <span>Class 20D</span>
+          </div>
+          <div class="contact-field">
+            <label>Subject</label>
+            <span>LGSI 1022 &mdash; Computing Essentials</span>
+          </div>
+          <div class="contact-field">
+            <label>Programme</label>
+            <span>Foundation in Science</span>
+          </div>
+          <div class="contact-field">
+            <label>All Members</label>
+            <table class="members-table">
+              <tr><td>1</td><td>Syeda Yzma Khan</td></tr>
+              <tr><td>2</td><td>Medha A/P Rajan</td></tr>
+              <tr><td>3</td><td>Khaleeda Zaitnahana Binti Mohamaddin</td></tr>
+              <tr><td>4</td><td>Ashera Reuel Balaji</td></tr>
+              <tr><td>5</td><td>Abrar Abdelmoiz</td></tr>
+              <tr><td>6</td><td>Bashir Ahmed Mohamed Rana</td></tr>
+              <tr><td>7</td><td>Nashira Binti Shah Razak Khan</td></tr>
+              <tr><td>8</td><td>Malaz Khalid Abdalla Mohamed</td></tr>
+              <tr><td>9</td><td>Maryam Naeem</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="contact-divider"></div>
+      <div class="contact-uni">
+        <h3>University</h3>
+        <div class="uni-badge">
+          <div class="uni-badge-icon">&#127891;</div>
+          <div class="uni-badge-text">
+            University of Cyberjaya
+            <span>Cyberjaya, Malaysia</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="references">
+  <div class="references-inner">
+    <div class="section-eyebrow">Sources</div>
+    <div class="section-title">References</div>
+    <p class="section-desc">A mix of academic research and trusted health sources used to support the content of this project.</p>
+
+    <div class="ref-list">
+
+      <div class="ref-item">
+        <div class="ref-num">01</div>
+        <div class="ref-body">
+          <div class="ref-source">World Health Organization</div>
+          <a class="ref-title" href="https://www.who.int/news-room/fact-sheets/detail/physical-activity" target="_blank" rel="noopener">Physical Activity and Sedentary Behaviour</a>
+          <p class="ref-desc">WHO guidelines on sedentary screen-based behaviour and its links to physical and mental health outcomes in young people.</p>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-num">02</div>
+        <div class="ref-body">
+          <div class="ref-source">Sleep Foundation</div>
+          <a class="ref-title" href="https://www.sleepfoundation.org/how-sleep-works/blue-light" target="_blank" rel="noopener">Blue Light and Sleep</a>
+          <p class="ref-desc">An overview of how blue light emitted from screens suppresses melatonin production and delays the body's natural sleep onset.</p>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-num">03</div>
+        <div class="ref-body">
+          <div class="ref-source">Harvard Medical School</div>
+          <a class="ref-title" href="https://www.health.harvard.edu/staying-healthy/blue-light-has-a-dark-side" target="_blank" rel="noopener">Blue Light Has a Dark Side</a>
+          <p class="ref-desc">Harvard Health Publishing examines the science behind blue light exposure and its measurable effect on circadian rhythms and sleep quality.</p>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-num">04</div>
+        <div class="ref-body">
+          <div class="ref-source">National Sleep Foundation</div>
+          <a class="ref-title" href="https://www.thensf.org/sleep-in-america-polls/" target="_blank" rel="noopener">Sleep in America Poll</a>
+          <p class="ref-desc">Annual survey data on sleep habits across age groups, with specific findings on the role of technology use in disrupted sleep patterns.</p>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-num">05</div>
+        <div class="ref-body">
+          <div class="ref-source">PubMed &mdash; National Library of Medicine</div>
+          <a class="ref-title" href="https://pubmed.ncbi.nlm.nih.gov/25324153/" target="_blank" rel="noopener">Evening Use of Light-Emitting eReaders Negatively Affects Sleep</a>
+          <p class="ref-desc">Peer-reviewed study published in PNAS showing that light-emitting device use before bed reduces sleepiness, delays the circadian clock and impairs next-morning alertness.</p>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-num">06</div>
+        <div class="ref-body">
+          <div class="ref-source">American Academy of Sleep Medicine</div>
+          <a class="ref-title" href="https://aasm.org/resources/factsheets/sleepandteens.pdf" target="_blank" rel="noopener">Sleep and Teens</a>
+          <p class="ref-desc">Fact sheet on recommended sleep durations for teenagers and the documented consequences of insufficient sleep on cognitive function and academic outcomes.</p>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-num">07</div>
+        <div class="ref-body">
+          <div class="ref-source">Healthline</div>
+          <a class="ref-title" href="https://www.healthline.com/health/sleep-deprivation/effects-on-body" target="_blank" rel="noopener">The Effects of Sleep Deprivation on Your Body</a>
+          <p class="ref-desc">A comprehensive breakdown of how chronic sleep deprivation affects the immune system, mood, cognitive performance and long-term physical health.</p>
+        </div>
+      </div>
+
+      <div class="ref-item">
+        <div class="ref-num">08</div>
+        <div class="ref-body">
+          <div class="ref-source">University of Chicago &mdash; Research</div>
+          <a class="ref-title" href="https://news.uchicago.edu/story/sleep-loss-academic-performance" target="_blank" rel="noopener">Sleep Loss and Academic Performance</a>
+          <p class="ref-desc">Research findings linking insufficient sleep in college students to lower GPAs, reduced class attendance and impaired memory consolidation after studying.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Screen &amp; Sleep</div>
+  <div class="footer-copy">Website by Yzma &middot; 20D</div>
+</footer>
+
+</body>
+</html>
